@@ -9,17 +9,6 @@ import imageio as iio
 import sys
 import os
 
-class Color:
-    def __init__(self, r, g, b):
-        self.r = r
-        self.g = g
-        self.b = b
-    def __eq__(self, other):
-        return self.r == other.r and self.g == other.g and self.b == other.b
-    def __format__(self, dummy):
-        return '#%02x%02x%02x' % (self.r, self.g, self.b)
-
-
 def printUsage():
     print("png2cbi v0.1 (alpha)")
     print(f"usage: {sys.argv[0]} <INPUT FILE> [SWITCHES]")
@@ -72,8 +61,8 @@ pixels = []
 
 for y in img:
     for x in y:
-        color = Color(x[0], x[1], x[2])
-        if color == Color(0, 0, 0):
+        averageBrightness = (int(x[0]) + int(x[1]) + int(x[2])) // 256
+        if averageBrightness < 128:
             pixels.append(1)
         else:
             pixels.append(0)
