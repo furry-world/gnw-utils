@@ -27,18 +27,27 @@ def printUsage():
     print("valid switches:")
     print("   -h          print help")
     print("   -o=<FILE>   specify output file name")
+    print("   -c          compress the image using RLE compression")
 
 
 fileNameIn = ""
 fileNameOut = ""
+compress = False
+
 
 arguments = sys.argv[1:]
 for arg in arguments:
+    if arg.startswith("-h"):
+        printUsage()
+        sys.exit()
 
-    if arg.startswith("-o="):
+    elif arg.startswith("-o="):
         fileNameOut = arg[3:]
 
-    fileNameIn = arg
+    elif arg.startswith("-c"):
+        compress = True
+
+    else: fileNameIn = arg
 
 if fileNameIn == "":
     printUsage()
@@ -70,15 +79,38 @@ for y in img:
             pixels.append(0)
 
 hytes = []
-for i in range(int(len(pixels) / 6)):
-    offset = i * 6
-    hyte = 0
-    for j in range(6):
-        hyte <<= 1
-        hyte += pixels[offset + j]
-    hytes.append(hyte)
+if compress:
+    currentColor = 0
+    currentRun = 0
+
+    for i in range(len(pixels)):
+        if pixels[i] == currentColor:
+            currentRun += 1
+        else:
+            if currentRun == 0:
+                hytes.append(0)
+                continue
+
+            while currentRun > 0:
+                hytes.append(currentRun % 64)
+                currentRun //= 64
+                if currentRun > 0: hytes.append(0)
+
+            if currentColor == 0: currentColor = 1
+            else: currentColor = 0
+
+else:
+    for i in range(len(pixels) // 6):
+        offset = i * 6
+        hyte = 0
+        for j in range(6):
+            hyte <<= 1
+            hyte += pixels[offset + j]
+        hytes.append(hyte)
 
 with open(fileNameOut, "wb") as file:
     for hyte in hytes:
         byte = hyte.to_bytes(1)
         file.write(byte)
+
+print(f"Wrote {len(hytes)} bytes.")
