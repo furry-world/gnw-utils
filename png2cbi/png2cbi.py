@@ -61,8 +61,8 @@ pixels = []
 
 for y in img:
     for x in y:
-        averageBrightness = (int(x[0]) + int(x[1]) + int(x[2])) // 256
-        if averageBrightness < 128:
+        averageBrightness = int(x[0]) + int(x[1]) + int(x[2])
+        if averageBrightness < 384:
             pixels.append(1)
         else:
             pixels.append(0)
