@@ -1,2 +1,2 @@
-# gnw-utils
-Small utilities for Game N' Wave
+# kepler-utils
+Small utilities for various Kepler machines
